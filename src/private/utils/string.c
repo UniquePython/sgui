@@ -15,7 +15,7 @@ bool sguiDuplicateCstr(const char *src, char **dest)
     if (!sguiAllocateBytes(&duplicate, length))
         return false;
 
-    memcpy(*duplicate, src, length);
+    memcpy(duplicate, src, length);
 
     *dest = duplicate;
     return true;
