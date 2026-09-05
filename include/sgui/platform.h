@@ -1,7 +1,10 @@
 #ifndef SGUI_PLATFORM_H_
 #define SGUI_PLATFORM_H_
 
+#include "sgui/error.h"
+
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct SguiWindow SguiWindow;
 
@@ -14,9 +17,6 @@ typedef struct SguiWindow SguiWindow;
  */
 typedef struct
 {
-    // Runs when window is opened
-    void (*onOpen)(SguiWindow *window);
-
     // Runs when window is closed
     void (*onClose)(SguiWindow *window);
 } EventHandlers;
@@ -36,23 +36,20 @@ typedef struct
      * Create and show a window of the given size/title.
      * Returns NULL on failure (backend should log the reason to stderr).
      */
-    SguiWindow *(*createWindow)(size_t width, size_t height, const char *title);
+    bool (*createWindow)(SguiWindow *window, size_t width, size_t height, const char *title, SguiError *error);
 
     /*
      * Register the callbacks to be invoked during run(). Replaces any
      * previously set handlers. Passing a struct with NULL members
      * disables those specific callbacks.
      */
-    void (*setHandlers)(SguiWindow *window, EventHandlers handlers);
-
-    // Blocks, dispatching registered callbacks, until requestStop() is called.
-    void (*run)(SguiWindow *window);
+    bool (*setHandlers)(SguiWindow *window, EventHandlers handlers, SguiError *error);
 
     /*
      * Signals run() to return after finishing the current iteration.
      * Safe to call from within a callback invoked by run().
      */
-    void (*requestStop)(SguiWindow *window);
+    bool (*requestStop)(SguiWindow *window, SguiError *error);
 
     /*
      * Releases all backend resources associated with window.
